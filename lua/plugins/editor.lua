@@ -5,8 +5,8 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
-    -- Load eagerly so parsers are ready before any buffer opens
-    lazy = false,
+    -- Load eagerly but don't block startup
+    event = { "BufReadPost", "BufNewFile" },
     dependencies = {
       "nvim-treesitter/nvim-treesitter-textobjects",
     },
@@ -135,8 +135,6 @@ return {
     event = "InsertEnter",
     config = function()
       require("nvim-autopairs").setup({ check_ts = true, fast_wrap = {} })
-      local cmp_autopairs = require("nvim-autopairs.completion.cmp")
-      require("cmp").event:on("confirm_done", cmp_autopairs.on_confirm_done())
     end,
   },
 
@@ -280,6 +278,47 @@ return {
       { "<leader>xs", "<cmd>Trouble symbols toggle focus=false<cr>",           desc = "Symbols (Trouble)" },
       { "<leader>xl", "<cmd>Trouble lsp toggle focus=false win.position=right<cr>", desc = "LSP Definitions (Trouble)" },
     },
+    config = true,
+  },
+
+  -- ── Oil (file explorer) ──────────────────────────────────────────────────
+  {
+    "stevearc/oil.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    keys = {
+      { "-", "<cmd>Oil<cr>", desc = "Open parent directory" },
+    },
+    config = function()
+      require("oil").setup({
+        default_file_explorer = false, -- Keep nvim-tree as default explorer
+        view_options = {
+          show_hidden = true,
+        },
+      })
+    end,
+  },
+
+  -- ── Harpoon ─────────────────────────────────────────────────────────────
+  {
+    "ThePrimeagen/harpoon",
+    branch = "harpoon2",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = function()
+      local harpoon = require("harpoon")
+      harpoon:setup()
+      vim.keymap.set("n", "<leader>a", function() harpoon:list():add() end, { desc = "Harpoon add file" })
+      vim.keymap.set("n", "<C-e>", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end, { desc = "Harpoon menu" })
+      vim.keymap.set("n", "<leader>1", function() harpoon:list():select(1) end, { desc = "Harpoon file 1" })
+      vim.keymap.set("n", "<leader>2", function() harpoon:list():select(2) end, { desc = "Harpoon file 2" })
+      vim.keymap.set("n", "<leader>3", function() harpoon:list():select(3) end, { desc = "Harpoon file 3" })
+      vim.keymap.set("n", "<leader>4", function() harpoon:list():select(4) end, { desc = "Harpoon file 4" })
+    end,
+  },
+
+  -- ── TS Autotag ──────────────────────────────────────────────────────────
+  {
+    "windwp/nvim-ts-autotag",
+    event = { "BufReadPost", "BufNewFile" },
     config = true,
   },
 }

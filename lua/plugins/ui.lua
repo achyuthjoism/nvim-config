@@ -160,27 +160,28 @@ return {
     event = "VeryLazy",
     dependencies = { "MunifTanjim/nui.nvim", "rcarriga/nvim-notify" },
     config = function()
-      -- Silence all vim.notify popups
+      -- Configure vim.notify popups to be unobtrusive
       require("notify").setup({
         background_colour = "#000000",
         render = "minimal",
         stages = "static",
-        timeout = 1,
+        timeout = 2000,
         top_down = false,
+        max_width = 50,
       })
-      vim.notify = function() end  -- swallow all notifications
+      -- Removing the vim.notify = function() end line so errors actually show up!
 
       require("noice").setup({
-        messages  = { enabled = false },   -- no command output popups
-        notify    = { enabled = false },   -- no vim.notify popups
-        errors    = { enabled = false },   -- no error popups
+        messages  = { enabled = true },   -- allow command output popups
+        notify    = { enabled = true },   -- allow vim.notify popups
+        errors    = { enabled = true },   -- allow error popups
         lsp = {
           override = {
             ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
             ["vim.lsp.util.stylize_markdown"] = true,
             ["cmp.entry.get_documentation"] = true,
           },
-          progress  = { enabled = false }, -- no LSP loading spinner
+          progress  = { enabled = false }, -- disabled in favor of fidget.nvim
           hover     = { enabled = true },  -- keep K hover docs
           signature = { enabled = true },  -- keep signature help
           message   = { enabled = false }, -- no "LSP loaded" messages
@@ -189,7 +190,35 @@ return {
           bottom_search         = true,
           command_palette       = true,
           long_message_to_split = true,
-          inc_rename            = false,
+          inc_rename            = true,    -- support inc-rename plugin
+        },
+      })
+    end,
+  },
+
+  -- ── LSP Progress ────────────────────────────────────────────────────────
+  {
+    "j-hui/fidget.nvim",
+    event = "LspAttach",
+    opts = {
+      progress = {
+        display = {
+          done_ttl = 3,
+        }
+      }
+    },
+  },
+
+  -- ── Highlight Word Under Cursor ─────────────────────────────────────────
+  {
+    "RRethy/vim-illuminate",
+    event = { "BufReadPost", "BufNewFile" },
+    config = function()
+      require("illuminate").configure({
+        delay = 200,
+        large_file_cutoff = 2000,
+        large_file_overrides = {
+          providers = { "lsp" },
         },
       })
     end,

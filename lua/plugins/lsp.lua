@@ -94,6 +94,7 @@ return {
         ["<C-b>"]     = { "scroll_documentation_up", "fallback" },
         ["<C-f>"]     = { "scroll_documentation_down", "fallback" },
         ["<C-Space>"] = { "show", "show_documentation", "hide_documentation" },
+        ["<C-g>"]     = { "show", "show_documentation", "hide_documentation" }, -- Fallback for terminals that swallow C-Space
       }
 
       opts.appearance = {
@@ -144,6 +145,7 @@ return {
         ensure_installed = {
           "lua_ls", "pyright", "ts_ls",
           "html", "cssls", "jsonls",
+          "tailwindcss", "emmet_language_server",
           "clangd", "astro",
         },
         automatic_installation = true,
@@ -245,6 +247,8 @@ return {
       setup("html")
       setup("cssls")
       setup("jsonls")
+      setup("tailwindcss")
+      setup("emmet_language_server")
       setup("astro")
 
       -- ── Completion toggle: <leader>ti ────────────────────────────────────
@@ -260,5 +264,32 @@ return {
         end
       end, { desc = "Toggle intellisense" })
     end,
+  },
+
+  -- ── clangd_extensions ───────────────────────────────────────────────────
+  {
+    "p00f/clangd_extensions.nvim",
+    lazy = true,
+    config = function() end,
+    opts = {
+      inlay_hints = {
+        inline = vim.fn.has("nvim-0.10") == 1,
+      },
+    }
+  },
+
+  -- ── inc-rename (Visual renaming) ────────────────────────────────────────
+  {
+    "smjonas/inc-rename.nvim",
+    cmd = "IncRename",
+    config = true,
+    keys = {
+      {
+        "<leader>rn",
+        function() return ":IncRename " .. vim.fn.expand("<cword>") end,
+        expr = true,
+        desc = "Rename symbol (inc-rename)",
+      },
+    },
   },
 }
